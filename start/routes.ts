@@ -13,7 +13,7 @@ router.group(() => {
 
   // Cambio de contraseña (Privada - Usuario logueado)
   router.patch('cambiar-password-perfil', '#controllers/autenticacion/recuperar_passwords_controller.cambiarConVerificacion')
-    .use(middleware.auth()) // Solo si el token es válido
+    .use(middleware.auth())
 
   // --- GESTIÓN DE USUARIOS (Administración) ---
   router.group(() => {
@@ -24,7 +24,7 @@ router.group(() => {
     router.patch('/:id/estado', '#controllers/usuarios/gestion_usuarios_controller.cambiarEstado')
   })
   .prefix('usuarios')
-  .use(middleware.auth()) // Protegemos todo el CRUD de usuarios
+  .use(middleware.auth())
 
   // --- SUPERMERCADOS Y PUNTOS DE RECICLAJE ---
   router.group(() => {
@@ -33,7 +33,16 @@ router.group(() => {
     router.get('/:id', '#controllers/supermercados/puntos_reciclaje_controller.show')
     router.put('/:id', '#controllers/supermercados/puntos_reciclaje_controller.update')
     router.delete('/:id', '#controllers/supermercados/puntos_reciclaje_controller.destroy')
-  }).prefix('supermercados')
+
+    // --- ENCARGADOS DE SUPERMERCADOS ---
+    router.post('/:id/encargados', '#controllers/supermercados/encargados_controller.crear')
+    router.get('/:id/encargados', '#controllers/supermercados/encargados_controller.listar')
+  })
+  .prefix('supermercados')
+
+  // eliminar encargado (fuera del grupo porque no necesita id de supermercado)
+  router.delete('encargados/:id', '#controllers/supermercados/encargados_controller.eliminar')
+    .use(middleware.auth())
 
   // --- MATERIALES ---
   router.group(() => {
@@ -41,7 +50,16 @@ router.group(() => {
     router.post('/', '#controllers/administracion/materiales_controller.store')
     router.put('/:id', '#controllers/administracion/materiales_controller.update')
     router.delete('/:id', '#controllers/administracion/materiales_controller.destroy')
-  }).prefix('materiales')
+  })
+  .prefix('materiales')
+
+  // --- ADMINISTRADORES ---
+  router.group(() => {
+    router.post('/', '#controllers/administracion/administradores_controller.crear')
+    router.get('/', '#controllers/administracion/administradores_controller.listar')
+  })
+  .prefix('administradores')
+  .use(middleware.auth())
 
   // --- ACUMULACIÓN Y CANJE DE PUNTOS ---
   router.group(() => {
@@ -49,6 +67,7 @@ router.group(() => {
     router.get('historial-acumulacion', '#controllers/puntos/acumulacion_puntos_controller.historial')
     router.post('canjear', '#controllers/puntos/canje_recompensas_controller.ejecutar')
     router.get('recompensas-disponibles', '#controllers/puntos/canje_recompensas_controller.listar')
-  }).use(middleware.auth())
+  })
+  .use(middleware.auth())
 
 }).prefix('api/v1')

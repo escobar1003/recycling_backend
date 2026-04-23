@@ -26,4 +26,4 @@ export default class AcumulacionPuntosController {
       mensaje: 'Historial de acumulación obtenido'
     })
   }
-}
+} 
